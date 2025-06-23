@@ -1,7 +1,10 @@
-import type { NextConfig } from "next";
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  transpilePackages: ['@supabase/realtime-js'],
+  // Optional: If using Supabase auth helpers
+  experimental: {
+    esmExternals: 'loose'
+  }
+}
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
+module.exports = nextConfig
