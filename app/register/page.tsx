@@ -1,5 +1,4 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -18,10 +17,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import Link from "next/link";
-
-// Schema validasi dengan Zod
+import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog";
+import { DialogHeader } from "@/components/ui/dialog";
+import { useState } from "react";
 
 export default function RegisterPage() {
+  const [showConfimasi, setShowConfirmarsi] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
   //const router = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -35,13 +37,13 @@ export default function RegisterPage() {
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      // 1. Registrasi user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
           data: {
-            full_name: data.full_name,
+            data: { full_name: data.full_name },
+            emailRedirectTo: `${location.origin}/auth/callback`,
           },
         },
       });
@@ -49,6 +51,9 @@ export default function RegisterPage() {
       // 2. Handle error dari Supabase Auth
       if (authError) {
         let errorMessage = authError.message;
+
+        setRegisteredEmail(data.email);
+        setShowConfirmarsi(true);
 
         // Terjemahkan error umum
         if (authError.message.includes("already registered")) {
@@ -74,10 +79,10 @@ export default function RegisterPage() {
         duration: 5000,
       });
 
-      redirect("/dashboard");
+      redirect("/");
     } catch {
-      toast("Registrasi Gagal", {
-        description: "Silakan coba lagi",
+      toast("Silakan Cek akun email Anda", {
+        description: "Comfirmasi akun anda terlebih dahulu",
         duration: 5000,
       });
     }
@@ -158,6 +163,36 @@ export default function RegisterPage() {
           </Link>
         </div>
       </div>
+      <Dialog open={showConfimasi} onOpenChange={setShowConfirmarsi}>
+        <DialogContent className="sm-max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Verifikasi Email Anda</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>
+              Kami Telah Mengirim link verifikasi ke{" "}
+              <span className="font-semibold">{registeredEmail}</span>
+            </p>
+            <div className="flex gap-2 pt-4">
+              <button
+                onClick={() => {
+                  setShowConfirmarsi(false);
+                  redirect("/login");
+                }}
+              >
+                Ke halaman login
+              </button>
+              <button
+                onClick={() => {
+                  window.location.href = `mailto:${registeredEmail}`;
+                }}
+              >
+                Buka Mail
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

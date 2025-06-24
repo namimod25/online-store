@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { supabase } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 const FormSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -40,11 +41,13 @@ export default function LoginPage() {
       });
 
       if (error) throw error;
-
-      router.push("/dashboard");
-    } catch (error) {
-      console.log(error);
+    } catch {
+      toast("Invalid email or password", {
+        description: "email tidak terdaftar",
+        duration: 3000,
+      });
     }
+    redirect("/dashboard");
   }
 
   return (

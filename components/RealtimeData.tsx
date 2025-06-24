@@ -8,7 +8,7 @@ export default function RealtimeData() {
     const channel = supabase
       .channel("realtime-changes")
       .on("postgres_changes", { event: "*", schema: "public" }, () => {
-        console.log("Change received!");
+        // Handle real-time updates
       })
       .subscribe();
 

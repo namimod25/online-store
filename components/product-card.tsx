@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button } from "./ui/button";
 import {
   Card,
@@ -19,7 +20,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({
-  //id,
+  id,
   name,
   description,
   price,
